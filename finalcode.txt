@@ -1,0 +1,418 @@
+#include<CountUpDownTimer.h>
+#include <SoftwareSerial.h>
+#include <Wire.h>4
+#include "RTClib.h"
+RTC_DS1307 rtc;
+#define m1 3
+#define m2 4
+#define m3 5  
+#define m4 6
+#define pin1 7
+#define pin2 8
+#define pin3 9
+#define pin4 10
+#define pin5 11
+int b1,b2,b3,b4;
+int temp=0,i=0;
+int hh1=0,mm1=0;                              
+int hh2=0,mm2=0;
+int hh3=0,mm3=0;                              
+int hh4=0,mm4=0;
+int hh5=0,mm5=0;                              
+int hh6=0,mm6=0;
+int hh7=0,mm7=0;                              
+int hh8=0,mm8=0;
+int hh9=0,mm9=0;
+int hh0=0,mm0=0;
+int rh1=0,rm1=0;
+int rh2=0,rm2=0;
+int rh3=0,rm3=0;
+int rh4=0,rm4=0;
+int rh5=0,rm5=0;
+int led=13;
+String fback,r1,r2,r3,r4,r5;
+char str[30];
+void setup()
+{
+  Serial.begin(9600);
+  pinMode(led, OUTPUT);
+   pinMode(m1, OUTPUT);
+    pinMode(m2, OUTPUT);
+     pinMode(m3, OUTPUT);
+     pinMode(m4, OUTPUT);
+     pinMode(pin1, INPUT);
+     digitalWrite(m1,HIGH);
+  digitalWrite(m2,HIGH);
+  digitalWrite(m3,HIGH);
+  digitalWrite(m4,HIGH);
+  
+    if (! rtc.begin()) 
+  {
+    Serial.println("Couldn't find RTC");
+    while (1);
+  }
+
+  if (! rtc.isrunning()) 
+  {
+    Serial.println("RTC is NOT running!");
+  }
+  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+  DateTime now = rtc.now(); 
+  Serial.println("AT+CNMI=2,2,0,0,0");
+  delay(500);
+  Serial.println("AT+CMGF=1");
+  delay(1000);
+ 
+}
+
+void loop()
+{
+  if(temp==1)
+  {
+    check();
+   temp=0;
+    i=0;
+  }   
+    DateTime now = rtc.now();
+if((now.hour()==hh1)&&(now.minute()==mm1)&&(now.second()==0)){
+          digitalWrite(m1, LOW);
+   fback="m1 on by rtc";
+   Serial.println(fback);
+  SendMessage();
+  delay(100);
+  }
+else if((now.hour()==hh2)&&(now.minute()==mm2)&&(now.second()==0)){
+    digitalWrite(m1, HIGH);
+     fback="m1 off by rtc";
+    Serial.println(fback);
+  SendMessage();
+  delay(100);
+}
+else if((now.hour()==hh3)&&(now.minute()==mm3)&&(now.second()==0)){
+          digitalWrite(m2, LOW);
+   fback="m2 on by rtc";
+   Serial.println(fback);
+  SendMessage();
+  delay(100);
+  }
+else if((now.hour()==hh4)&&(now.minute()==mm4)&&(now.second()==0)){
+    digitalWrite(m2, HIGH);
+     fback="m2 off by rtc";
+    Serial.println(fback);
+  SendMessage();
+  delay(100);
+}
+else if((now.hour()==hh5)&&(now.minute()==mm5)&&(now.second()==0)){
+          digitalWrite(m3, LOW);
+   fback="m3 on by rtc";
+   Serial.println(fback);
+  SendMessage();
+  delay(100);
+  }
+else if((now.hour()==hh6)&&(now.minute()==mm6)&&(now.second()==0)){
+    digitalWrite(m3, HIGH);
+     fback="m3 off by rtc";
+    Serial.println(fback);
+  SendMessage();
+  delay(100);
+}
+else if((now.hour()==hh7)&&(now.minute()==mm7)&&(now.second()==0)){
+          digitalWrite(m4, LOW);
+   fback="m4 on by rtc";
+   Serial.println(fback);
+  SendMessage();
+  delay(100);
+  }
+else if((now.hour()==hh8)&&(now.minute()==mm8)&&(now.second()==0)){
+    digitalWrite(m4, HIGH);
+     fback="m4 off by rtc";
+    Serial.println(fback);
+  SendMessage();
+  delay(100);
+}
+else if((now.hour()==hh9)&&(now.minute()==mm9)&&(now.second()==0)){
+          digitalWrite(m1, LOW);
+          digitalWrite(m2, LOW);
+          digitalWrite(m3, LOW);
+          digitalWrite(m4, LOW);
+   fback="m1,m2,m3m4 on by rtc";
+   Serial.println(fback);
+  SendMessage();
+  delay(100);
+  }
+else if((now.hour()==hh0)&&(now.minute()==mm0)&&(now.second()==0)){
+    digitalWrite(m1, HIGH);
+    digitalWrite(m2, HIGH);
+    digitalWrite(m3, HIGH);
+    digitalWrite(m4, HIGH);
+     fback="m1,m2,m3,m4 off by rtc";
+    Serial.println(fback);
+  SendMessage();
+  delay(100);
+}
+delay(200);
+}
+void SendMessage()
+{
+  Serial.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+  delay(1000);  // Delay of 1000 milli seconds or 1 second
+  Serial.println("AT+CMGS=\"+918340054495\"\r"); // Replm4e x with mobile number
+  delay(1000);
+  Serial.println(fback);// The SMS text you want to send
+  delay(100);
+  Serial.println((char)26);// ASCII code of CTRL+Z
+  delay(1000);
+}
+ void serialEvent() 
+ {
+  while(Serial.available()) 
+  {
+    if(Serial.find("#"))
+    {
+      digitalWrite(led, HIGH);
+      delay(1000);
+      digitalWrite(led, LOW);
+      while (Serial.available()) 
+      {
+      char inChar=Serial.read();
+      str[i++]=inChar;
+      if(inChar=='*')
+      {
+        temp=1;
+        return;
+      } 
+      } 
+    }
+   }
+    }
+void check()
+{
+   DateTime now = rtc.now();
+   if(!(strncmp(str,"m3 off",6)))
+    {
+      digitalWrite(m3, HIGH);
+      rh3=abs(now.hour()-rh3);
+      rm3=abs(now.minute()-rm3);
+      fback="m3 is turned off and runned for"+String(rh3)+":"+String(rm3);
+       SendMessage();
+      delay(200);
+    }  
+   
+   else if(!(strncmp(str,"m3 on",5)))
+    {
+      digitalWrite(m3, LOW);
+     fback="m3 is turned on";
+      rh3=now.hour();
+       rm3=now.minute();
+      SendMessage();
+      delay(200);
+    }
+  else if(!(strncmp(str,"m4 off",6)))
+    {
+      digitalWrite(m4, HIGH);
+      fback="m4 is turned off";
+      SendMessage();
+      delay(200);
+    }  
+   
+   else if(!(strncmp(str,"m4 on",5)))
+    {
+      digitalWrite(m4, LOW);
+      rh4=now.hour();
+       rm4=now.minute();
+     fback="m4 is turned on";
+      SendMessage();
+      delay(200);
+    }
+  
+    else if(!(strncmp(str,"m1 off",6)))
+    {
+      digitalWrite(m1,HIGH);
+     fback="m1 is turned off";
+      SendMessage();
+      delay(200);
+    }
+ 
+    else if(!(strncmp(str,"m1 on",5)))
+    {
+      digitalWrite(m1,LOW);
+      rh1=now.hour();
+       rm1=now.minute();
+      fback="m1 is turned on";
+      SendMessage();
+      delay(200);
+    }
+ 
+    else if(!(strncmp(str,"m2 off",6)))
+    { 
+      digitalWrite(m2, HIGH);
+      fback="m2 is turned off";
+      SendMessage();
+      delay(200);
+    }
+ 
+    else if(!(strncmp(str,"m2 on",5)))
+    {
+      digitalWrite(m2, LOW);
+     rh2=now.hour();
+       rm2=now.minute();
+     fback="m2 is turned on";
+      SendMessage();
+      delay(200);
+    } 
+    
+    else if(!(strncmp(str,"all off",7))) 
+    {
+      digitalWrite(m2, HIGH);
+      digitalWrite(m1, HIGH);
+      digitalWrite(m3, HIGH);
+      digitalWrite(m4, HIGH);
+      
+      fback="all switches off";
+      SendMessage();
+      delay(200);
+    }
+ 
+    else if(!(strncmp(str,"all on",6)))
+    {
+      digitalWrite(m2, LOW);
+      digitalWrite(m1, LOW);
+      digitalWrite(m3, LOW);
+         digitalWrite(m4, LOW);
+         rh5=now.hour();
+       rm5=now.minute();
+    fback="all switches on";
+      SendMessage();
+      delay(200);
+    }  
+     else if(!(strncmp(str,"status",6)))
+    {
+      b1=digitalRead(m1);
+       b2=digitalRead(m2);
+        b3=digitalRead(m3);
+         b4=digitalRead(m4);
+         if(b1==1){
+          r1="#m1 off*";
+         }
+         if(b1==0){
+          r1="#m1 on*";
+         }
+         if(b2==1){
+          r2="#m2 off*";
+         }
+         if(b2==0){
+          r2="#m2 on*";
+         }
+         if(b3==1){
+          r3="#m3 off*";
+         }
+         if(b3==0){
+          r3="#m3 on*";
+         }
+         if(b4==1){
+          r4="#m4 off*";
+         }
+         if(b4==0){
+          r4="#m4 on*";
+         }
+         if(digitalRead(pin1)==1){
+          r5="power off";
+         }
+         if(digitalRead(pin1)==0){
+          r5="power on";
+         }
+      fback=r5+r1+r2+r3+r4;
+      SendMessage();
+      delay(200);
+}  
+else if(!(strncmp(str,"set time1 on ",13))) 
+    {
+     int n = sscanf(str,"set time1 on %d:%d",&hh1,&mm1);
+     Serial.println(hh1);
+     Serial.println(mm1);
+     fback="timer1 is on";
+      SendMessage();
+      delay(200);
+    }
+    else if(!(strncmp(str,"set time1 off ",14)))
+    {
+     int n = sscanf(str,"set time1 off %d:%d",&hh2,&mm2);
+     Serial.println(hh2);
+     Serial.println(mm2);
+     fback="timer1 is off";
+      SendMessage();
+      delay(200);
+    }        
+else if(!(strncmp(str,"set time2 on ",13))) 
+    {
+     int n = sscanf(str,"set time2 on %d:%d",&hh3,&mm3);
+     Serial.println(hh3);
+     Serial.println(mm3);
+     fback="timer2 is on";
+      SendMessage();
+      delay(200);
+    }
+    else if(!(strncmp(str,"set time2 off ",14)))
+    {
+     int n = sscanf(str,"set time2 off %d:%d",&hh4,&mm4);
+     Serial.println(hh4);
+     Serial.println(mm4);
+     fback="timer2 is off";
+      SendMessage();
+      delay(200);
+    }        
+else if(!(strncmp(str,"set time3 on ",13))) 
+    {
+     int n = sscanf(str,"set time3 on %d:%d",&hh5,&mm5);
+     Serial.println(hh5);
+     Serial.println(mm5);
+     fback="timer3 is on";
+      SendMessage();
+      delay(200);
+    }
+    else if(!(strncmp(str,"set time3 off ",14)))
+    {
+     int n = sscanf(str,"set time3 off %d:%d",&hh6,&mm6);
+     Serial.println(hh6);
+     Serial.println(mm6);
+     fback="timer3 is off";
+      SendMessage();
+      delay(200);
+    }        
+ else if(!(strncmp(str,"set time4 on ",13))) 
+    {
+     int n = sscanf(str,"set time4 on %d:%d",&hh7,&mm7);
+     Serial.println(hh7);
+     Serial.println(mm7);
+     fback="timer4 is on";
+      SendMessage();
+      delay(200);
+    }
+   else if(!(strncmp(str,"set time4 off ",14)))
+    {
+     int n = sscanf(str,"set time4 off %d:%d",&hh8,&mm8);
+     Serial.println(hh8);
+     Serial.println(mm8);
+     fback="timer4 is off";
+      SendMessage();
+      delay(200);
+    }
+else if(!(strncmp(str,"set timer on ",13))) 
+    {
+     int n = sscanf(str,"set timer on %d:%d",&hh9,&mm9);
+     Serial.println(hh9);
+     Serial.println(mm9);
+     fback="timer is on";
+      SendMessage();
+      delay(200);
+    }
+   else if(!(strncmp(str,"set timer off ",14)))
+    {
+     int n = sscanf(str,"set timer off %d:%d",&hh0,&mm0);
+     Serial.println(hh0);
+     Serial.println(mm0);
+     fback="timer is off";
+      SendMessage();
+      delay(200);
+    }
+}
